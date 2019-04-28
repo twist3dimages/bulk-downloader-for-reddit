@@ -16,7 +16,6 @@ from pathlib import Path, PurePath
 
 from src.downloader import Direct, Erome, Gfycat, Imgur, Self
 from src.errors import *
-from src.parser import LinkDesigner
 from src.searcher import getPosts
 from src.tools import (GLOBAL, createLogFile, jsonFile, nameCorrector,
                        printToFile)
@@ -97,10 +96,6 @@ def parseArguments(arguments=[]):
                         help="Auto quit afer the process finishes",
                         action="store_true",
                         default=False)
-
-    parser.add_argument("--link","-l",
-                        help="Get posts from link",
-                        metavar="link")
 
     parser.add_argument("--saved",
                         action="store_true",
@@ -388,21 +383,6 @@ def prepareAttributes():
         ATTRIBUTES["time"] = GLOBAL.arguments.time
     else:
         ATTRIBUTES["time"] = "all"
-
-    if GLOBAL.arguments.link is not None:
-
-        GLOBAL.arguments.link = GLOBAL.arguments.link.strip("\"")
-
-        ATTRIBUTES = LinkDesigner(GLOBAL.arguments.link)
-
-        if GLOBAL.arguments.search is not None:
-            ATTRIBUTES["search"] = GLOBAL.arguments.search
-
-        if GLOBAL.arguments.sort is not None:
-            ATTRIBUTES["sort"] = GLOBAL.arguments.sort
-
-        if GLOBAL.arguments.time is not None:
-            ATTRIBUTES["time"] = GLOBAL.arguments.time
 
     elif GLOBAL.arguments.subreddit is not None:
         if type(GLOBAL.arguments.subreddit) == list:    
