@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from src.errors import (AlbumNotDownloadedCompletely, FileAlreadyExistsError,
                         FileNameTooLong, ImgurLoginError,
                         NotADownloadableLinkError)
-from src.tools import GLOBAL, nameCorrector, printToFile
+from src.utils import GLOBAL, nameCorrector, printToFile
 
 VanillaPrint = print
 print = printToFile

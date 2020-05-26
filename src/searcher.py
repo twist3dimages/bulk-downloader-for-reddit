@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 import praw
 from prawcore.exceptions import NotFound, ResponseException, Forbidden
 
-from src.tools import GLOBAL, createLogFile, jsonFile, printToFile
+from src.utils import GLOBAL, createLogFile, jsonFile, printToFile
 from src.errors import (NoMatchingSubmissionFound, NoPrawSupport,
                         NoRedditSupport, MultiredditNotFound,
                         InvalidSortingType, RedditLoginFailed,

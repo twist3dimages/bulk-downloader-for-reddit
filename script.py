@@ -18,7 +18,7 @@ from src.downloader import Direct, Erome, Gfycat, Imgur, Self
 from src.errors import *
 from src.parser import LinkDesigner
 from src.searcher import getPosts
-from src.tools import (GLOBAL, createLogFile, jsonFile, nameCorrector,
+from src.utils import (GLOBAL, createLogFile, jsonFile, nameCorrector,
                        printToFile)
 
 __author__ = "Ali Parlakci"
