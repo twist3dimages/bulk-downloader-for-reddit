@@ -9,7 +9,7 @@ from src.errors import (FileNameTooLong, AlbumNotDownloadedCompletely,
 from src.utils import nameCorrector
 from src.utils import printToFile as print
 
-class Gfycat:
+class Redgifs:
     def __init__(self,directory,POST):
         try:
             POST['mediaURL'] = self.getLink(POST['postURL'])
@@ -17,7 +17,7 @@ class Gfycat:
             raise NotADownloadableLinkError("Could not read the page source")
 
         POST['postExt'] = getExtension(POST['mediaURL'])
-        
+
         if not os.path.exists(directory): os.makedirs(directory)
         title = nameCorrector(POST['postTitle'])
 
@@ -31,7 +31,7 @@ class Gfycat:
         tempDir = directory / (
             POST["postSubmitter"]+"_"+title+"_"+POST['postId']+".tmp"
         )
-        
+
         try:
             getFile(fileDir,tempDir,POST['mediaURL'])
         except FileNameTooLong:
@@ -39,7 +39,7 @@ class Gfycat:
             tempDir = directory / (POST['postId']+".tmp")
 
             getFile(fileDir,tempDir,POST['mediaURL'])
-      
+
     def getLink(self, url, query='<source id="mp4Source" src=', lineNumber=105):
         """Extract direct link to the video from page's source
         and return it
@@ -51,7 +51,7 @@ class Gfycat:
         if url[-1:] == '/':
             url = url[:-1]
 
-        url = "https://gfycat.com/" + url.split('/')[-1]
+        url = "https://redgifs.com/watch/" + url.split('/')[-1]
 
         pageSource = (urllib.request.urlopen(url).read().decode())
 

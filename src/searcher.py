@@ -299,6 +299,8 @@ def redditSearcher(posts,SINGLE_POST=False):
     orderCount = 0
     global gfycatCount
     gfycatCount = 0
+    global redgifsCount
+    redgifsCount = 0
     global imgurCount
     imgurCount = 0
     global eromeCount
@@ -394,6 +396,7 @@ def redditSearcher(posts,SINGLE_POST=False):
 
 def checkIfMatching(submission):
     global gfycatCount
+    global redgifsCount
     global imgurCount
     global eromeCount
     global directCount
@@ -422,6 +425,11 @@ def checkIfMatching(submission):
     elif 'erome' in submission.domain:
         details['postType'] = 'erome'
         eromeCount += 1
+        return details
+
+    elif 'redgifs' in submission.domain:
+        details['postType'] = 'redgifs'
+        redgifsCount += 1
         return details
 
     elif submission.is_self:
@@ -495,7 +503,7 @@ def isDirectLink(URL):
             return False
 
     for extension in imageTypes:
-        if extension in URL:
+        if extension in URL.split("/")[-1]:
             return URL
     else:
         return False

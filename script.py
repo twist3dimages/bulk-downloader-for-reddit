@@ -18,6 +18,7 @@ from src.downloaders.Direct import Direct
 from src.downloaders.Erome import Erome
 from src.downloaders.Gfycat import Gfycat
 from src.downloaders.Imgur import Imgur
+from src.downloaders.redgifs import Redgifs
 from src.downloaders.selfPost import SelfPost
 from src.errors import *
 from src.parser import LinkDesigner
@@ -500,7 +501,8 @@ def downloadPost(SUBMISSION):
     global lastRequestTime
 
     downloaders = {
-        "imgur":Imgur,"gfycat":Gfycat,"erome":Erome,"direct":Direct,"self":SelfPost
+        "imgur":Imgur,"gfycat":Gfycat,"erome":Erome,"direct":Direct,"self":SelfPost,
+        "redgifs":Redgifs
     }
 
     print()
