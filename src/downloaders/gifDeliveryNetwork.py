@@ -8,9 +8,8 @@ from src.errors import (FileNameTooLong, AlbumNotDownloadedCompletely,
                         NotADownloadableLinkError, FileAlreadyExistsError)
 from src.utils import nameCorrector
 from src.utils import printToFile as print
-from src.downloaders.gifDeliveryNetwork import GifDeliveryNetwork
 
-class Gfycat:
+class GifDeliveryNetwork:
     def __init__(self,directory,POST):
         try:
             POST['mediaURL'] = self.getLink(POST['postURL'])
@@ -47,21 +46,22 @@ class Gfycat:
         and return it
         """
 
-        if '.webm' in url or '.mp4' in url or '.gif' in url:
+        if '.webm' in url.split('/')[-1] or '.mp4' in url.split('/')[-1] or '.gif' in url.split('/')[-1]:
             return url
 
         if url[-1:] == '/':
             url = url[:-1]
 
-        url = "https://gfycat.com/" + url.split('/')[-1]
+        url = "https://www.gifdeliverynetwork.com/" + url.split('/')[-1]
 
         pageSource = (urllib.request.urlopen(url).read().decode())
 
         soup = BeautifulSoup(pageSource, "html.parser")
-        attributes = {"data-react-helmet":"true","type":"application/ld+json"}
-        content = soup.find("script",attrs=attributes)
+        attributes = {"id":"mp4Source","type":"video/mp4"}
+        content = soup.find("source",attrs=attributes)
 
         if content is None:
-            return GifDeliveryNetwork.getLink(url)
+            
+            raise NotADownloadableLinkError("Could not read the page source")
 
-        return json.loads(content.contents[0])["video"]["contentUrl"]
+        return content["src"]
