@@ -35,12 +35,12 @@ def beginPraw(config,user_agent = str(socket.gethostname())):
             server.close()
             return client
 
-        def send_message(self, message):
+        def send_message(self, client, message):
             """Send message to client and close the connection."""
-            self.client.send(
+            client.send(
                 'HTTP/1.1 200 OK\r\n\r\n{}'.format(message).encode('utf-8')
             )
-            self.client.close()
+            client.close()
 
         def getRefreshToken(self,*scopes):
             state = str(random.randint(0, 65000))
@@ -48,8 +48,8 @@ def beginPraw(config,user_agent = str(socket.gethostname())):
             print("Go to this URL and login to reddit:\n\n",url)
             webbrowser.open(url,new=2)
 
-            self.client = self.recieve_connection()
-            data = self.client.recv(1024).decode('utf-8')
+            client = self.recieve_connection()
+            data = client.recv(1024).decode('utf-8')
             str(data)
             param_tokens = data.split(' ', 2)[1].split('?', 1)[1].split('&')
             params = {
@@ -67,7 +67,7 @@ def beginPraw(config,user_agent = str(socket.gethostname())):
                 raise RedditLoginFailed
             
             refresh_token = self.redditInstance.auth.authorize(params['code'])
-            self.send_message(
+            self.send_message(client,
                 "<script>" \
                 "alert(\"You can go back to terminal window now.\");" \
                 "</script>"
