@@ -14,10 +14,10 @@ import webbrowser
 from io import StringIO
 from pathlib import Path, PurePath
 
-from src.downloaders.direct import Direct
-from src.downloaders.erome import Erome
-from src.downloaders.gfycat import Gfycat
-from src.downloaders.imgur import Imgur
+from src.downloaders.Direct import Direct
+from src.downloaders.Erome import Erome
+from src.downloaders.Gfycat import Gfycat
+from src.downloaders.Imgur import Imgur
 from src.downloaders.selfPost import SelfPost
 from src.errors import *
 from src.parser import LinkDesigner
