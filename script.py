@@ -217,7 +217,6 @@ def download(submissions):
             downloadedCount -= 1
         
         except Exception as exception:
-            raise Exception
             print(
                 "{class_name}: {info}".format(
                     class_name=exception.__class__.__name__,info=str(exception)
