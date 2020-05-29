@@ -12,7 +12,7 @@ class Reddit:
     
     def __init__(self,refresh_token=None):
         self.SCOPES = ['identity','history','read']
-        self.PORT = 1337
+        self.PORT = 7634
         self.refresh_token = refresh_token
         self.redditInstance = None
         self.arguments = {
