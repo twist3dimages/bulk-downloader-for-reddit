@@ -1,4 +1,5 @@
 import praw
+import random
 import socket
 import webbrowser
 from prawcore.exceptions import NotFound, ResponseException, Forbidden
@@ -11,7 +12,7 @@ class Reddit:
     
     def __init__(self,config):
         self.SCOPES = ['identity','history','read']
-        self.PORT = "1337"
+        self.PORT = 1337
         self.config = config
         self.redditInstance = None
         self.arguments = {
