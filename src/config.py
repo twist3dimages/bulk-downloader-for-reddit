@@ -3,6 +3,8 @@ import socket
 import webbrowser
 import random
 
+from src.reddit import Reddit
+from src.utils import GLOBAL
 from src.jsonHelper import JsonFile
 
 def getConfig(configFileName):
@@ -14,16 +16,20 @@ def getConfig(configFileName):
     if os.path.exists(configFileName):
         FILE = JsonFile(configFileName)
         content = FILE.read()
-        if "reddit_refresh_token" in content:
-            if content["reddit_refresh_token"] == "":
-                FILE.delete("reddit_refresh_token")
+        if "reddit_refresh_token" in content and len(content["reddit_refresh_token"]) != 0:
+            pass
+        else:
+            Reddit(GLOBAL.config).begin()
 
         if not all(False if content.get(key,"") == "" else True for key in keys):
             print(
-                "Go to this URL and fill the form: " \
+                "---Setting up the Imgur API---\n\n" \
+                "Go to this URL and fill the form:\n" \
                 "https://api.imgur.com/oauth2/addclient\n" \
-                "Enter the client id and client secret here:"
+                "Then, enter the client id and client secret here\n" \
+                "Press Enter to open the link in the browser"
             )
+            input()
             webbrowser.open("https://api.imgur.com/oauth2/addclient",new=2)
 
         for key in keys:
@@ -31,7 +37,8 @@ def getConfig(configFileName):
                 if content[key] == "":
                     raise KeyError
             except KeyError:
-                FILE.add({key:input("  "+key+": ")})
+                FILE.add({key:input("\t"+key+": ")})
+        print()
         return JsonFile(configFileName).read()
 
     else:

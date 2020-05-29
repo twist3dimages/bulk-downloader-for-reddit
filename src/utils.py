@@ -85,7 +85,6 @@ def nameCorrector(string):
             spacesRemoved.append(string[b])
     
     string = ''.join(spacesRemoved)
-    correctedString = []
     
     if len(string.split('\n')) > 1:
         string = "".join(string.split('\n'))

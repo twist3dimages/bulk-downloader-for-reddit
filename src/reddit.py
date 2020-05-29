@@ -68,7 +68,8 @@ class Reddit:
     def getRefreshToken(self,*scopes):
         state = str(random.randint(0, 65000))
         url = self.redditInstance.auth.url(scopes, state, 'permanent')
-        print("Go to this URL and login to reddit:\n\n",url)
+        print("---Setting up the Reddit API---\n")
+        print("Go to this URL and login to reddit:\n",url,sep="\n",end="\n\n")
         webbrowser.open(url,new=2)
 
         client = self.recieve_connection()
