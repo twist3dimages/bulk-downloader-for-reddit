@@ -5,6 +5,7 @@ import time
 from os import makedirs, path, remove
 from pathlib import Path
 
+from src.jsonHelper import JsonFile
 from src.errors import FileNotFoundError
 
 class GLOBAL:
@@ -19,56 +20,6 @@ class GLOBAL:
     reddit_client_id = "BSyphDdxYZAgVQ"
     reddit_client_secret = "bfqNJaRh8NMh-9eAr-t4TRz-Blk"
     printVanilla = print
-
-class jsonFile:
-    """ Write and read JSON files
-
-    Use add(self,toBeAdded) to add to files
-
-    Use delete(self,*deletedKeys) to delete keys
-    """
-    
-    FILEDIR = ""
-
-    def __init__(self,FILEDIR):
-        self.FILEDIR = FILEDIR
-        if not path.exists(self.FILEDIR):
-            self.__writeToFile({},create=True)
-
-    def read(self):
-            with open(self.FILEDIR, 'r') as f:
-                return json.load(f)
-
-    def add(self,toBeAdded):
-        """Takes a dictionary and merges it with json file.
-        It uses new key's value if a key already exists.
-        Returns the new content as a dictionary.
-        """
-
-        data = self.read()
-        data = {**data, **toBeAdded}
-        self.__writeToFile(data)
-        return self.read()
-
-    def delete(self,*deleteKeys):
-        """Delete given keys from JSON file.
-        Returns the new content as a dictionary.
-        """
-
-        data = self.read()
-        for deleteKey in deleteKeys:
-            if deleteKey in data:
-                del data[deleteKey]
-                found = True
-        if not found:
-            return False
-        self.__writeToFile(data)
-
-    def __writeToFile(self,content,create=False):
-        if not create:
-            remove(self.FILEDIR)
-        with open(self.FILEDIR, 'w') as f:
-            json.dump(content, f, indent=4)
 
 def createLogFile(TITLE):
     """Create a log file with given name
@@ -85,7 +36,7 @@ def createLogFile(TITLE):
     if not path.exists(folderDirectory):
         makedirs(folderDirectory)
 
-    FILE = jsonFile(folderDirectory / Path(logFilename))
+    FILE = JsonFile(folderDirectory / Path(logFilename))
     HEADER = " ".join(sys.argv)
     FILE.add({"HEADER":HEADER})
 
@@ -134,7 +85,6 @@ def nameCorrector(string):
             spacesRemoved.append(string[b])
     
     string = ''.join(spacesRemoved)
-    correctedString = []
     
     if len(string.split('\n')) > 1:
         string = "".join(string.split('\n'))
