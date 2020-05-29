@@ -7,13 +7,13 @@ from src.downloaders.downloaderUtils import getExtension
 
 from src.errors import (FileNameTooLong, AlbumNotDownloadedCompletely, 
                         NotADownloadableLinkError, FileAlreadyExistsError)
-from src.utils import nameCorrector
+from src.utils import GLOBAL
 from src.utils import printToFile as print
 
 class Erome:
     def __init__(self,directory,post):
         try:
-            IMAGES = self.getLinks(post['postURL'])
+            IMAGES = self.getLinks(post['CONTENTURL'])
         except urllib.error.HTTPError:
             raise NotADownloadableLinkError("Not a downloadable link")
 
@@ -27,14 +27,15 @@ class Erome:
 
             """Filenames are declared here"""
 
-            title = nameCorrector(post['postTitle'])
-            print(post["postSubmitter"]+"_"+title+"_"+post['postId']+extension)
+            filename = GLOBAL.config['filename'].format(**post)
+
+            print(filename+post["EXTENSION"])
 
             fileDir = directory / (
-                post["postSubmitter"]+"_"+title+"_"+post['postId']+extension
+                filename+post['EXTENSION']
             )
             tempDir = directory / (
-                post["postSubmitter"]+"_"+title+"_"+post['postId']+".tmp"
+                GLOBAL.config["filename"].format(**post)+".tmp"
             )
 
             imageURL = IMAGES[0]
@@ -44,23 +45,22 @@ class Erome:
             try:
                 getFile(fileDir,tempDir,imageURL)
             except FileNameTooLong:
-                fileDir = directory / (post['postId'] + extension)
-                tempDir = directory / (post['postId'] + '.tmp')
+                fileDir = directory / (post['POSTID'] + extension)
+                tempDir = directory / (post['POSTID'] + '.tmp')
                 getFile(fileDir,tempDir,imageURL)
 
         else:
-            title = nameCorrector(post['postTitle'])
-            print(post["postSubmitter"]+"_"+title+"_"+post['postId'],end="\n\n")
+            filename = GLOBAL.config['filename'].format(**post)
 
-            folderDir = directory / (
-                post["postSubmitter"] + "_" + title + "_" + post['postId']
-            )
+            print(filename)
+
+            folderDir = directory / filename
 
             try:
                 if not os.path.exists(folderDir):
                     os.makedirs(folderDir)
             except FileNotFoundError:
-                folderDir = directory / post['postId']
+                folderDir = directory / post['POSTID']
                 os.makedirs(folderDir)
 
             for i in range(imagesLenght):

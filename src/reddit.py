@@ -10,10 +10,10 @@ from src. errors import RedditLoginFailed
 
 class Reddit:
     
-    def __init__(self,config):
+    def __init__(self,refresh_token=None):
         self.SCOPES = ['identity','history','read']
         self.PORT = 1337
-        self.config = config
+        self.refresh_token = refresh_token
         self.redditInstance = None
         self.arguments = {
             "client_id":GLOBAL.reddit_client_id,
@@ -23,8 +23,8 @@ class Reddit:
 
     def begin(self):
 
-        if "reddit_refresh_token" in self.config:
-            self.arguments["refresh_token"] = self.config["reddit_refresh_token"]
+        if self.refresh_token:
+            self.arguments["refresh_token"] = self.refresh_token
             self.redditInstance = praw.Reddit(**self.arguments)
             try:
                 self.redditInstance.auth.scopes()

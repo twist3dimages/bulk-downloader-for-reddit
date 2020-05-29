@@ -4,24 +4,57 @@ import webbrowser
 import random
 
 from src.reddit import Reddit
-from src.utils import GLOBAL
 from src.jsonHelper import JsonFile
 
-def getConfig(configFileName):
-    """Read credentials from config.json file"""
+class Config():
 
-    keys = ['imgur_client_id',
-            'imgur_client_secret']
+    def __init__(self,filename):
+        self.filename = filename
+        self.file = JsonFile(self.filename)
 
-    if os.path.exists(configFileName):
-        FILE = JsonFile(configFileName)
-        content = FILE.read()
+    def generate(self):
+        self._validateCredentials()
+        self._validateCustomFileName()
+        self._validateCustomFolderPath()
+        return self.file.read()
+
+    def setCustomFileName(self):
+        pass
+
+    def _validateCustomFileName(self,name=None):
+        content = self.file.read()
+        if not "filename" in content:
+            self.file.add({
+                "filename": "{REDDITOR}_{TITLE}_{POSTID}"
+            })
+        elif not "{POSTID}" in content["filename"]:
+            self.file.add({
+                "filename": content["filename"] + "_{POSTID}"
+            })
+
+    def setCustomFolderPath(self):
+        pass
+
+    def _validateCustomFolderPath(self,path=None):
+        content = self.file.read()
+        if not "folderpath" in content:
+            self.file.add({
+                "folderpath": "\\{SUBREDDIT}\\"
+            })
+
+    def _validateCredentials(self):
+        """Read credentials from config.json file"""
+
+        keys = ['imgur_client_id',
+                'imgur_client_secret']
+
+        content = self.file.read()
         if "reddit_refresh_token" in content and len(content["reddit_refresh_token"]) != 0:
             pass
         else:
-            Reddit(GLOBAL.config).begin()
+            Reddit().begin()
 
-        if not all(False if content.get(key,"") == "" else True for key in keys):
+        if not all(content.get(key,False) for key in keys):
             print(
                 "---Setting up the Imgur API---\n\n" \
                 "Go to this URL and fill the form:\n" \
@@ -37,20 +70,5 @@ def getConfig(configFileName):
                 if content[key] == "":
                     raise KeyError
             except KeyError:
-                FILE.add({key:input("\t"+key+": ")})
+                self.file.add({key:input("\t"+key+": ")})
         print()
-        return JsonFile(configFileName).read()
-
-    else:
-        FILE = JsonFile(configFileName)
-        configDictionary = {}
-        print(
-            "Go to this URL and fill the form: " \
-            "https://api.imgur.com/oauth2/addclient\n" \
-            "Enter the client id and client secret here:"
-            )
-        webbrowser.open("https://api.imgur.com/oauth2/addclient",new=2)
-        for key in keys:
-            configDictionary[key] = input("  "+key+": ")
-        FILE.add(configDictionary)
-        return FILE.read()

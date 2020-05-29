@@ -6,39 +6,40 @@ from bs4 import BeautifulSoup
 from src.downloaders.downloaderUtils import getFile, getExtension
 from src.errors import (FileNameTooLong, AlbumNotDownloadedCompletely, 
                         NotADownloadableLinkError, FileAlreadyExistsError)
-from src.utils import nameCorrector
+from src.utils import GLOBAL
 from src.utils import printToFile as print
 
 class Redgifs:
     def __init__(self,directory,POST):
         try:
-            POST['mediaURL'] = self.getLink(POST['postURL'])
+            POST['MEDIAURL'] = self.getLink(POST['CONTENTURL'])
         except IndexError:
             raise NotADownloadableLinkError("Could not read the page source")
 
-        POST['postExt'] = getExtension(POST['mediaURL'])
-
+        POST['EXTENSION'] = getExtension(POST['MEDIAURL'])
+        
         if not os.path.exists(directory): os.makedirs(directory)
-        title = nameCorrector(POST['postTitle'])
 
         """Filenames are declared here"""
 
-        print(POST["postSubmitter"]+"_"+title+"_"+POST['postId']+POST['postExt'])
+        filename = GLOBAL.config['filename'].format(**POST)
+
+        print(filename+POST["EXTENSION"])
 
         fileDir = directory / (
-            POST["postSubmitter"]+"_"+title+"_"+POST['postId']+POST['postExt']
+            filename+POST['EXTENSION']
         )
         tempDir = directory / (
-            POST["postSubmitter"]+"_"+title+"_"+POST['postId']+".tmp"
+            GLOBAL.config["filename"].format(**POST)+".tmp"
         )
-
+        
         try:
-            getFile(fileDir,tempDir,POST['mediaURL'])
+            getFile(fileDir,tempDir,POST['MEDIAURL'])
         except FileNameTooLong:
-            fileDir = directory / (POST['postId']+POST['postExt'])
-            tempDir = directory / (POST['postId']+".tmp")
+            fileDir = directory / (POST['POSTID']+POST['EXTENSION'])
+            tempDir = directory / (POST['POSTID']+".tmp")
 
-            getFile(fileDir,tempDir,POST['mediaURL'])
+            getFile(fileDir,tempDir,POST['MEDIAURL'])
 
     def getLink(self, url):
         """Extract direct link to the video from page's source
