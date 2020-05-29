@@ -24,57 +24,16 @@ from src.downloaders.gifDeliveryNetwork import GifDeliveryNetwork
 from src.errors import *
 from src.parser import LinkDesigner
 from src.searcher import getPosts
-from src.utils import (GLOBAL, createLogFile, jsonFile, nameCorrector,
+from src.utils import (GLOBAL, createLogFile, nameCorrector,
                        printToFile)
+from src.jsonHelper import JsonFile
+from src.config import getConfig
 
 __author__ = "Ali Parlakci"
 __license__ = "GPL"
 __version__ = "1.7.0"
 __maintainer__ = "Ali Parlakci"
 __email__ = "parlakciali@gmail.com"
-
-def getConfig(configFileName):
-    """Read credentials from config.json file"""
-
-    keys = ['imgur_client_id',
-            'imgur_client_secret']
-
-    if os.path.exists(configFileName):
-        FILE = jsonFile(configFileName)
-        content = FILE.read()
-        if "reddit_refresh_token" in content:
-            if content["reddit_refresh_token"] == "":
-                FILE.delete("reddit_refresh_token")
-
-        if not all(False if content.get(key,"") == "" else True for key in keys):
-            print(
-                "Go to this URL and fill the form: " \
-                "https://api.imgur.com/oauth2/addclient\n" \
-                "Enter the client id and client secret here:"
-            )
-            webbrowser.open("https://api.imgur.com/oauth2/addclient",new=2)
-
-        for key in keys:
-            try:
-                if content[key] == "":
-                    raise KeyError
-            except KeyError:
-                FILE.add({key:input("  "+key+": ")})
-        return jsonFile(configFileName).read()
-
-    else:
-        FILE = jsonFile(configFileName)
-        configDictionary = {}
-        print(
-            "Go to this URL and fill the form: " \
-            "https://api.imgur.com/oauth2/addclient\n" \
-            "Enter the client id and client secret here:"
-            )
-        webbrowser.open("https://api.imgur.com/oauth2/addclient",new=2)
-        for key in keys:
-            configDictionary[key] = input("  "+key+": ")
-        FILE.add(configDictionary)
-        return FILE.read()
 
 def parseArguments(arguments=[]):
     """Initialize argparse and add arguments"""
@@ -440,7 +399,7 @@ def postFromLog(fileName):
     submissions
     """
     if Path.is_file(Path(fileName)):
-        content = jsonFile(fileName).read()
+        content = JsonFile(fileName).read()
     else:
         print("File not found")
         sys.exit()
@@ -500,6 +459,7 @@ def downloadPost(SUBMISSION):
     directory = GLOBAL.directory / SUBMISSION['postSubreddit']
 
     global lastRequestTime
+    lastRequestTime = 0
 
     downloaders = {
         "imgur":Imgur,"gfycat":Gfycat,"erome":Erome,"direct":Direct,"self":SelfPost,
