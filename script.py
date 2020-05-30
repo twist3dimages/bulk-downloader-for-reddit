@@ -320,7 +320,10 @@ if __name__ == "__main__":
     try:
         VanillaPrint = print
         print = printToFile
-        GLOBAL.RUN_TIME = time.time()
+        GLOBAL.RUN_TIME = str(time.strftime(
+                                      "%d-%m-%Y_%H-%M-%S",
+                                      time.localtime(time.time())
+                                      ))
         main()
 
     except KeyboardInterrupt:

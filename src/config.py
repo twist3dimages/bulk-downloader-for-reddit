@@ -35,7 +35,7 @@ For example: {FLAIR}_{SUBREDDIT}_{REDDITOR}
 
 Existing filename template:""", None if "filename" not in self.file.read() else self.file.read()["filename"])
 
-        filename = input(">> ")
+        filename = input(">> ").upper()
         self.file.add({
             "filename": filename
         })
@@ -47,7 +47,9 @@ Existing filename template:""", None if "filename" not in self.file.read() else 
             self.file.add({
                 "filename": "{REDDITOR}_{TITLE}_{POSTID}"
             })
-        elif not "{POSTID}" in content["filename"]:
+        content = self.file.read()
+
+        if not "{POSTID}" in content["filename"]:
             self.file.add({
                 "filename": content["filename"] + "_{POSTID}"
             })
@@ -65,7 +67,7 @@ For example: {REDDITOR}/{SUBREDDIT}/{FLAIR}
 
 Existing folder structure""", None if "folderpath" not in self.file.read() else self.file.read()["folderpath"])
 
-        folderpath = input(">> ").strip("\\").strip("/")
+        folderpath = input(">> ").strip("\\").strip("/").upper()
 
         self.file.add({
             "folderpath": folderpath

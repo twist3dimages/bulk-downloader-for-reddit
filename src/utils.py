@@ -1,7 +1,6 @@
 import io
 import json
 import sys
-import time
 from os import makedirs, path, remove
 from pathlib import Path
 
@@ -11,7 +10,7 @@ from src.errors import FileNotFoundError
 class GLOBAL:
     """Declare global variables"""
 
-    RUN_TIME = 0
+    RUN_TIME = ""
     config = {'imgur_client_id':None, 'imgur_client_secret': None}
     arguments = None
     directory = None
@@ -27,10 +26,8 @@ def createLogFile(TITLE):
     put given arguments inside \"HEADER\" key
     """
 
-    folderDirectory = GLOBAL.directory / "LOG_FILES" / \
-                      str(time.strftime(
-                          "%d-%m-%Y_%H-%M-%S",time.localtime(GLOBAL.RUN_TIME)
-                      ))
+    folderDirectory = GLOBAL.directory / "LOG_FILES" / GLOBAL.RUN_TIME   
+
     logFilename = TITLE.upper()+'.json'
 
     if not path.exists(folderDirectory):
@@ -47,9 +44,7 @@ def printToFile(*args, noPrint=False,**kwargs):
     CONSOLE LOG file in a folder time stampt in the name
     """
     
-    TIME = str(time.strftime("%d-%m-%Y_%H-%M-%S",
-                             time.localtime(GLOBAL.RUN_TIME)))
-    folderDirectory = GLOBAL.directory / "LOG_FILES" / TIME
+    folderDirectory = GLOBAL.directory / Path("LOG_FILES") / Path(GLOBAL.RUN_TIME)
 
     if not noPrint or \
        GLOBAL.arguments.verbose or \
