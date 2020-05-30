@@ -96,6 +96,15 @@ class Arguments:
                             metavar="TIME_LIMIT",
                             type=str)
 
+        parser.add_argument("--skip",
+                            nargs="+",
+                            help="Skip given posts from domain",
+                            choices=[
+                                "gfycat","imgur","redgifs",
+                                "erome","gifdelverynetwork","direct","self"
+                            ],
+                            type=str)                   
+
         if arguments == []:
             return parser.parse_args()
         else:

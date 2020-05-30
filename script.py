@@ -314,4 +314,4 @@ if __name__ == "__main__":
                       exc_info=full_exc_info(sys.exc_info()))
         print(log_stream.getvalue())
 
-    #if not GLOBAL.arguments.quit: input("\nPress enter to quit\n")
+    if not GLOBAL.arguments.quit: input("\nPress enter to quit\n")

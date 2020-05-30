@@ -252,7 +252,7 @@ def extractDetails(posts,SINGLE_POST=False):
                 except AttributeError:
                     continue
 
-                result = matchWithDownloader(submission)
+                result = matchWithDownloader(submission,skip=GLOBAL.arguments.skip)
 
                 if result is not None:
                     details = {**details, **result}
@@ -270,30 +270,31 @@ def extractDetails(posts,SINGLE_POST=False):
     else:
         raise NoMatchingSubmissionFound("No matching submission was found")
 
-def matchWithDownloader(submission):
+def matchWithDownloader(submission,skip=[]):
 
-    if 'gfycat' in submission.domain:
+    if 'gfycat' in submission.domain and 'gfycat' not in skip:
         return {'TYPE': 'gfycat'}
 
-    elif 'imgur' in submission.domain:
+    elif 'imgur' in submission.domain and 'imgur' not in skip:
         return {'TYPE': 'imgur'}
 
-    elif 'erome' in submission.domain:
+    elif 'erome' in submission.domain and 'erome' not in skip:
         return {'TYPE': 'erome'}
 
-    elif 'redgifs' in submission.domain:
+    elif 'redgifs' in submission.domain and 'redgifs' not in skip:
         return {'TYPE': 'redgifs'}
 
-    elif 'gifdeliverynetwork' in submission.domain:
+    elif 'gifdeliverynetwork' in submission.domain and 'gifdeliverynetwork' not in skip:
         return {'TYPE': 'gifdeliverynetwork'}
 
-    elif submission.is_self:
+    elif submission.is_self and 'self' not in skip:
         return {'TYPE': 'self',
                 'CONTENT': submission.selftext}
 
     try:
-        return {'TYPE': 'direct',
-                'CONTENTURL': extractDirectLink(submission.url)}
+        if 'direct' not in skip:
+            return {'TYPE': 'direct',
+                    'CONTENTURL': extractDirectLink(submission.url)}
     except DirectLinkNotFound:
         return None        
 
