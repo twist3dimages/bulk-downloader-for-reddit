@@ -35,7 +35,7 @@ def getExtension(link):
         else:
             return '.mp4'
 
-def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
+def getFile(filename,shortFilename,folderDir,imageURL,indent=0, silent=False):
 
     headers = [
         ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
@@ -56,9 +56,9 @@ def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
 
     filename = nameCorrector(filename)
 
-    print(" "*indent + str(folderDir),
-         " "*indent + str(filename),
-         sep="\n")
+    if not silent: print(" "*indent + str(folderDir),
+                         " "*indent + str(filename),
+                         sep="\n")
 
     for i in range(3):
         fileDir = Path(folderDir) / filename
@@ -78,11 +78,11 @@ def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
                     GLOBAL.hashList.add(fileHash)
 
                 os.rename(tempDir,fileDir)
-                print(" "*indent+"Downloaded"+" "*10)
+                if not silent: print(" "*indent+"Downloaded"+" "*10)
                 break
             except ConnectionResetError as exception:
-                print(" "*indent + str(exception))
-                print(" "*indent + "Trying again\n")
+                if not silent: print(" "*indent + str(exception))
+                if not silent: print(" "*indent + "Trying again\n")
             except FileNotFoundError:
                 filename = shortFilename
         else:

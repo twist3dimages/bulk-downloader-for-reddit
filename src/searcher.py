@@ -276,6 +276,21 @@ def extractDetails(posts,SINGLE_POST=False):
 
 def matchWithDownloader(submission,skip=[]):
 
+    if 'v.redd.it' in submission.domain and 'v.redd.it' not in skip:
+        bitrates = ["DASH_1080","DASH_720","DASH_600", \
+                    "DASH_480","DASH_360","DASH_240"]
+                    
+        for bitrate in bitrates:
+            videoURL = submission.url+"/"+bitrate
+
+            try:
+                responseCode = urllib.request.urlopen(videoURL).getcode()
+            except urllib.error.HTTPError:
+                responseCode = 0
+
+            if responseCode == 200:
+                return {'TYPE': 'v.redd.it', 'CONTENTURL': videoURL}    
+
     if 'gfycat' in submission.domain and 'gfycat' not in skip:
         return {'TYPE': 'gfycat'}
 

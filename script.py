@@ -20,6 +20,7 @@ from src.downloaders.Gfycat import Gfycat
 from src.downloaders.Imgur import Imgur
 from src.downloaders.redgifs import Redgifs
 from src.downloaders.selfPost import SelfPost
+from src.downloaders.vreddit import VReddit
 from src.downloaders.gifDeliveryNetwork import GifDeliveryNetwork
 from src.errors import ImgurLimitError, NoSuitablePost, FileAlreadyExistsError, ImgurLoginError, NotADownloadableLinkError, NoSuitablePost, full_exc_info
 from src.parser import LinkDesigner
@@ -84,7 +85,8 @@ def downloadPost(SUBMISSION,directory):
 
     downloaders = {
         "imgur":Imgur,"gfycat":Gfycat,"erome":Erome,"direct":Direct,"self":SelfPost,
-        "redgifs":Redgifs, "gifdeliverynetwork": GifDeliveryNetwork
+        "redgifs":Redgifs, "gifdeliverynetwork": GifDeliveryNetwork,
+        "v.redd.it": VReddit
     }
 
     print()
