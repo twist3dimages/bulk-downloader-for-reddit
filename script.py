@@ -157,7 +157,12 @@ def download(submissions):
     FAILED_FILE = createLogFile("FAILED")
 
     for i in range(len(submissions)):
-        print(f"\n({i+1}/{subsLenght}) – {submissions[i]['POSTID']} – r/{submissions[i]['SUBREDDIT']}",
+        print(f"\n({i+1}/{subsLenght})",end=" — ")
+        print(submissions[i]['POSTID'],
+              f"r/{submissions[i]['SUBREDDIT']}",
+              f"u/{submissions[i]['REDDITOR']}",
+              submissions[i]['FLAIR'] if submissions[i]['FLAIR'] else "",
+              sep=" — ",
               end="")
         print(f" – {submissions[i]['TYPE'].upper()}",end="",noPrint=True)
 
