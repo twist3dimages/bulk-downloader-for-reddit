@@ -2,7 +2,10 @@ import sys
 import os
 from urllib.error import HTTPError
 import urllib.request
+from pathlib import Path
 
+from src.utils import nameCorrector
+from src.utils import printToFile as print
 from src.errors import FileAlreadyExistsError, FileNameTooLong
 
 def dlProgress(count, blockSize, totalSize):
@@ -30,16 +33,7 @@ def getExtension(link):
         else:
             return '.mp4'
 
-def getFile(fileDir,tempDir,imageURL,indent=0):
-    """Downloads given file to given directory.
-
-    fileDir -- Full file directory
-    tempDir -- Full file directory with the extension of '.tmp'
-    imageURL -- URL to the file to be downloaded
-
-    redditID -- Post's reddit id if renaming the file is necessary.
-                As too long file names seem not working.
-    """
+def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
 
     headers = [
         ("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) " \
@@ -58,20 +52,28 @@ def getFile(fileDir,tempDir,imageURL,indent=0):
         opener.addheaders = headers
     urllib.request.install_opener(opener)
 
-    if not (os.path.isfile(fileDir)):
-        for i in range(3):
+    filename = nameCorrector(filename)
+
+    print(" "*indent + str(folderDir),
+         " "*indent + str(filename),
+         sep="\n")
+
+    for i in range(3):
+        fileDir = Path(folderDir) / filename
+        tempDir = Path(folderDir) / (filename+".tmp")
+
+        if not (os.path.isfile(fileDir)):
             try:
                 urllib.request.urlretrieve(imageURL,
                                            tempDir,
                                            reporthook=dlProgress)
                 os.rename(tempDir,fileDir)
+                print(" "*indent+"Downloaded"+" "*10)
+                break
             except ConnectionResetError as exception:
                 print(" "*indent + str(exception))
                 print(" "*indent + "Trying again\n")
             except FileNotFoundError:
-                raise FileNameTooLong
-            else:
-                print(" "*indent+"Downloaded"+" "*10)
-                break
-    else:
-        raise FileAlreadyExistsError
+                filename = shortFilename
+        else:
+            raise FileAlreadyExistsError

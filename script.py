@@ -27,7 +27,7 @@ from src.searcher import getPosts
 from src.utils import (GLOBAL, createLogFile, nameCorrector,
                        printToFile)
 from src.jsonHelper import JsonFile
-from src.config import getConfig
+from src.config import Config
 from src.arguments import Arguments
 from src.programMode import ProgramMode
 
@@ -55,51 +55,29 @@ def postFromLog(fileName):
     posts = []
 
     for post in content:
-        if not content[post][-1]['postType'] == None:
+        if not content[post][-1]['TYPE'] == None:
             posts.append(content[post][-1])
 
     return posts
 
-def isPostExists(POST):
+def isPostExists(POST,directory):
     """Figure out a file's name and checks if the file already exists"""
 
-    title = nameCorrector(POST['postTitle'])
-    PATH = GLOBAL.directory / POST["postSubreddit"]
+    filename = GLOBAL.config['filename'].format(**POST)
 
     possibleExtensions = [".jpg",".png",".mp4",".gif",".webm",".md"]
 
-    """If you change the filenames, don't forget to add them here.
-    Please don't remove existing ones
-    """
     for extension in possibleExtensions:
 
-        OLD_FILE_PATH = PATH / (
-            title
-            + "_" + POST['postId']
-            + extension
-        )
-        FILE_PATH = PATH / (
-            POST["postSubmitter"] 
-            + "_" + title 
-            + "_" + POST['postId'] 
-            + extension
-        )
+        path = directory / Path(filename+extension)
 
-        SHORT_FILE_PATH = PATH / (POST['postId']+extension)
-
-        if OLD_FILE_PATH.exists() or \
-           FILE_PATH.exists() or \
-           SHORT_FILE_PATH.exists():
-           
+        if path.exists():
             return True
 
     else:
         return False
 
-def downloadPost(SUBMISSION):
-
-    """Download directory is declared here for each file"""
-    directory = GLOBAL.directory / SUBMISSION['postSubreddit']
+def downloadPost(SUBMISSION,directory):
 
     global lastRequestTime
     lastRequestTime = 0
@@ -110,9 +88,10 @@ def downloadPost(SUBMISSION):
     }
 
     print()
-    if SUBMISSION['postType'] in downloaders:
+    if SUBMISSION['TYPE'] in downloaders:
 
-        if SUBMISSION['postType'] == "imgur":
+        # WORKAROUND FOR IMGUR API LIMIT
+        if SUBMISSION['TYPE'] == "imgur":
             
             while int(time.time() - lastRequestTime) <= 2:
                 pass
@@ -157,7 +136,7 @@ def downloadPost(SUBMISSION):
 
                 raise ImgurLimitError('{} LIMIT EXCEEDED\n'.format(KEYWORD.upper()))
 
-        downloaders[SUBMISSION['postType']] (directory,SUBMISSION)
+        downloaders[SUBMISSION['TYPE']] (directory,SUBMISSION)
 
     else:
         raise NoSuitablePost
@@ -177,22 +156,25 @@ def download(submissions):
 
     FAILED_FILE = createLogFile("FAILED")
 
-    for i in range(subsLenght):
-        print(f"\n({i+1}/{subsLenght}) – {submissions[i]['postId']} – r/{submissions[i]['postSubreddit']}",
+    for i in range(len(submissions)):
+        print(f"\n({i+1}/{subsLenght}) – {submissions[i]['POSTID']} – r/{submissions[i]['SUBREDDIT']}",
               end="")
-        print(f" – {submissions[i]['postType'].upper()}",end="",noPrint=True)
+        print(f" – {submissions[i]['TYPE'].upper()}",end="",noPrint=True)
 
-        if isPostExists(submissions[i]):
+        details = {**submissions[i], **{"TITLE": nameCorrector(submissions[i]['TITLE'])}}
+        directory = GLOBAL.directory / GLOBAL.config["folderpath"].format(**details)
+
+        if isPostExists(details,directory):
             print(f"\n" \
-                  f"{submissions[i]['postSubmitter']}_"
-                  f"{nameCorrector(submissions[i]['postTitle'])}")
+                  f"{details['REDDITOR']}_"
+                  f"{details['TITLE']}")
             print("It already exists")
             duplicates += 1
             downloadedCount -= 1
             continue
 
         try:
-            downloadPost(submissions[i])
+            downloadPost(details,directory)
         
         except FileAlreadyExistsError:
             print("It already exists")
@@ -211,13 +193,13 @@ def download(submissions):
                 "{class_name}: {info}".format(
                     class_name=exception.__class__.__name__,info=str(exception)
                 ),
-                submissions[i]
+                details
             ]})
             downloadedCount -= 1
 
         except NotADownloadableLinkError as exception:
             print(
-                "{class_name}: {info}".format(
+                "{class_name}: {info} See CONSOLE_LOG.txt for more information".format(
                     class_name=exception.__class__.__name__,info=str(exception)
                 )
             )
@@ -233,15 +215,20 @@ def download(submissions):
             print("No match found, skipping...")
             downloadedCount -= 1
         
-        except Exception as exception:
+        except Exception as exc:
             print(
-                "{class_name}: {info}".format(
-                    class_name=exception.__class__.__name__,info=str(exception)
+                "{class_name}: {info} See CONSOLE_LOG.txt for more information".format(
+                    class_name=exc.__class__.__name__,info=str(exc)
                 )
             )
+
+            logging.error(sys.exc_info()[0].__name__,
+                          exc_info=full_exc_info(sys.exc_info()))
+            print(log_stream.getvalue(),noPrint=True)
+
             FAILED_FILE.add({int(i+1):[
                 "{class_name}: {info}".format(
-                    class_name=exception.__class__.__name__,info=str(exception)
+                    class_name=exc.__class__.__name__,info=str(exc)
                 ),
                 submissions[i]
             ]})
@@ -272,11 +259,6 @@ def main():
     arguments = Arguments.parse()
     GLOBAL.arguments = arguments
 
-    if arguments.directory is not None:
-        GLOBAL.directory = Path(arguments.directory.strip())
-    else:
-        GLOBAL.directory = Path(input("\ndownload directory: ").strip())
-
     if not Path(GLOBAL.defaultConfigDirectory).is_dir():
         os.makedirs(GLOBAL.defaultConfigDirectory)
 
@@ -285,12 +267,28 @@ def main():
     else:
         GLOBAL.configDirectory = GLOBAL.defaultConfigDirectory  / "config.json"
 
-    GLOBAL.config = getConfig(GLOBAL.configDirectory)
+    GLOBAL.config = Config(GLOBAL.configDirectory).generate()
+
+    if arguments.set_filename:
+        Config(GLOBAL.configDirectory).setCustomFileName()
+        sys.exit()
+
+    if arguments.set_folderpath:
+        Config(GLOBAL.configDirectory).setCustomFolderPath()
+        sys.exit()
+        
+    if arguments.directory:
+        GLOBAL.directory = Path(arguments.directory.strip())
+    else:
+        GLOBAL.directory = Path(input("\ndownload directory: ").strip())
+
+    print("\n"," ".join(sys.argv),"\n",noPrint=True)
 
     if arguments.log is not None:
         logDir = Path(arguments.log)
         download(postFromLog(logDir))
         sys.exit()
+
 
     programMode = ProgramMode(arguments).generate()
 
@@ -331,4 +329,4 @@ if __name__ == "__main__":
                       exc_info=full_exc_info(sys.exc_info()))
         print(log_stream.getvalue())
 
-    #if not GLOBAL.arguments.quit: input("\nPress enter to quit\n")
+    if not GLOBAL.arguments.quit: input("\nPress enter to quit\n")
