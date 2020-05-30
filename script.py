@@ -165,9 +165,9 @@ def download(submissions):
         directory = GLOBAL.directory / GLOBAL.config["folderpath"].format(**details)
 
         if isPostExists(details,directory):
-            print(f"\n" \
-                  f"{details['REDDITOR']}_"
-                  f"{details['TITLE']}")
+            print()
+            print(directory)
+            print(GLOBAL.config['filename'].format(**details))
             print("It already exists")
             duplicates += 1
             downloadedCount -= 1

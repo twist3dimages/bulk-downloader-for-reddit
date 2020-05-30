@@ -67,8 +67,7 @@ class Imgur:
 
                 shortFilename = (str(i+1) + "_" + images[i]['id'])
 
-                print("  ({}/{})".format(i+1,imagesLenght))
-                print("  {}".format(filename+images[i]['Ext']))
+                print("\n  ({}/{})".format(i+1,imagesLenght))
 
                 try:
                     getFile(filename,shortFilename,folderDir,imageURL,indent=2)
