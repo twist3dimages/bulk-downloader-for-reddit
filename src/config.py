@@ -117,3 +117,13 @@ Existing folder structure""", None if "folderpath" not in self.file.read() else 
                 self.file.add({key:input("\t"+key+": ")},
                               "credentials")
         print()
+
+    def setDefaultDirectory(self):
+        print("""Set a default directory to use in case no directory is given
+Leave blank to reset it. You can use {time} in foler names to use to timestamp it
+For example: D:/archive/BDFR_{time}
+""")
+        print("Current default directory:", self.file.read()["default_directory"] if "default_directory" in self.file.read() else "")
+        self.file.add({
+            "default_directory": input(">> ")
+        })

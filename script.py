@@ -259,7 +259,6 @@ def printLogo():
 
 def main():
 
-    printLogo()
 
     arguments = Arguments.parse()
     GLOBAL.arguments = arguments
@@ -281,12 +280,19 @@ def main():
     if arguments.set_folderpath:
         Config(GLOBAL.configDirectory).setCustomFolderPath()
         sys.exit()
+
+    if arguments.set_default_directory:
+        Config(GLOBAL.configDirectory).setDefaultDirectory()
+        sys.exit()
         
     if arguments.directory:
         GLOBAL.directory = Path(arguments.directory.strip())
+    elif "default_directory" in GLOBAL.config and GLOBAL.config["default_directory"] is not "":
+        GLOBAL.directory = Path(GLOBAL.config["default_directory"].format(time=GLOBAL.RUN_TIME))
     else:
         GLOBAL.directory = Path(input("\ndownload directory: ").strip())
 
+    printLogo()
     print("\n"," ".join(sys.argv),"\n",noPrint=True)
 
     if arguments.log is not None:
@@ -328,11 +334,11 @@ if __name__ == "__main__":
 
     except KeyboardInterrupt:
         if GLOBAL.directory is None:
-            GLOBAL.directory = Path(".\\")
+            GLOBAL.directory = Path("..\\")
         
     except Exception as exception:
         if GLOBAL.directory is None:
-            GLOBAL.directory = Path(".\\")
+            GLOBAL.directory = Path("..\\")
         logging.error(sys.exc_info()[0].__name__,
                       exc_info=full_exc_info(sys.exc_info()))
         print(log_stream.getvalue())

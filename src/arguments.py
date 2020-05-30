@@ -115,6 +115,11 @@ class Arguments:
                             action="store_true",
                             help="Set custom filename",
                             ) 
+        
+        parser.add_argument("--set-default-directory",
+                            action="store_true",
+                            help="Set a default directory to be used in case no directory is given",
+                            ) 
 
         if arguments == []:
             return parser.parse_args()
