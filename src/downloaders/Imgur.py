@@ -27,23 +27,11 @@ class Imgur:
 
             post['EXTENSION'] = getExtension(post['MEDIAURL'])
 
-            filename = GLOBAL.config['filename'].format(**post)
+            filename = GLOBAL.config['filename'].format(**post)+post["EXTENSION"]
+            shortFilename = post['POSTID']+post['EXTENSION']
+            print(filename)
 
-            print(filename+post["EXTENSION"])
-
-            fileDir = directory / (
-                filename+post['EXTENSION']
-            )
-            tempDir = directory / (
-                GLOBAL.config["filename"].format(**post)+".tmp"
-            )
-
-            try:
-                getFile(fileDir,tempDir,post['MEDIAURL'])
-            except FileNameTooLong:
-                fileDir = directory / post['POSTID'] + post['EXTENSION']
-                tempDir = directory / post['POSTID'] + '.tmp'
-                getFile(fileDir,tempDir,post['MEDIAURL'])
+            getFile(filename,shortFilename,directory,post['MEDIAURL'])
 
         elif content['type'] == 'album':
             images = content['object'].images
@@ -51,14 +39,9 @@ class Imgur:
             howManyDownloaded = imagesLenght
             duplicates = 0
 
-            title = nameCorrector(post['TITLE'])
-            print(post["REDDITOR"]+"_"+title+"_"+post['POSTID'],end="\n\n")
-
-            folderDir = directory / (
-                post["REDDITOR"] + "_" + title + "_" + post['POSTID']
-            )
-
             filename = GLOBAL.config['filename'].format(**post)
+
+            print(filename)
 
             folderDir = directory / filename
 
@@ -77,41 +60,24 @@ class Imgur:
 
                 images[i]['Ext'] = getExtension(imageURL)
 
-                fileName = (str(i+1)
+                filename = (str(i+1)
                             + "_"
                             + nameCorrector(str(images[i]['title']))
                             + "_"
                             + images[i]['id'])
 
-                """Filenames are declared here"""
-
-                fileDir = folderDir / (fileName + images[i]['Ext'])
-                tempDir = folderDir / (fileName + ".tmp")
+                shortFilename = (str(i+1) + "_" + images[i]['id'])
 
                 print("  ({}/{})".format(i+1,imagesLenght))
-                print("  {}".format(fileName+images[i]['Ext']))
+                print("  {}".format(filename+images[i]['Ext']))
 
                 try:
-                    getFile(fileDir,tempDir,imageURL,indent=2)
+                    getFile(filename,shortFilename,folderDir,imageURL,indent=2)
                     print()
                 except FileAlreadyExistsError:
                     print("  The file already exists" + " "*10,end="\n\n")
                     duplicates += 1
                     howManyDownloaded -= 1
-
-                # IF FILE NAME IS TOO LONG, IT WONT REGISTER
-                except FileNameTooLong:
-                    fileName = (str(i+1) + "_" + images[i]['id'])
-                    fileDir = folderDir / (fileName + images[i]['Ext'])
-                    tempDir = folderDir / (fileName + ".tmp")
-                    try:
-                        getFile(fileDir,tempDir,imageURL,indent=2)
-                    # IF STILL TOO LONG
-                    except FileNameTooLong:
-                        fileName = str(i+1)
-                        fileDir = folderDir / (fileName + images[i]['Ext'])
-                        tempDir = folderDir / (fileName + ".tmp")
-                        getFile(fileDir,tempDir,imageURL,indent=2)
 
                 except Exception as exception:
                     print("\n  Could not get the file")

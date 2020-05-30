@@ -103,7 +103,8 @@ class Arguments:
                                 "gfycat","imgur","redgifs",
                                 "erome","gifdelverynetwork","direct","self"
                             ],
-                            type=str)                   
+                            type=str,
+                            default=[])                   
 
         if arguments == []:
             return parser.parse_args()

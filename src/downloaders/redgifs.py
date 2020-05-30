@@ -20,26 +20,11 @@ class Redgifs:
         
         if not os.path.exists(directory): os.makedirs(directory)
 
-        """Filenames are declared here"""
+        filename = GLOBAL.config['filename'].format(**POST)+POST["EXTENSION"]
+        shortFilename = POST['POSTID']+POST['EXTENSION']
+        print(filename)
 
-        filename = GLOBAL.config['filename'].format(**POST)
-
-        print(filename+POST["EXTENSION"])
-
-        fileDir = directory / (
-            filename+POST['EXTENSION']
-        )
-        tempDir = directory / (
-            GLOBAL.config["filename"].format(**POST)+".tmp"
-        )
-        
-        try:
-            getFile(fileDir,tempDir,POST['MEDIAURL'])
-        except FileNameTooLong:
-            fileDir = directory / (POST['POSTID']+POST['EXTENSION'])
-            tempDir = directory / (POST['POSTID']+".tmp")
-
-            getFile(fileDir,tempDir,POST['MEDIAURL'])
+        getFile(filename,shortFilename,directory,POST['MEDIAURL'])
 
     def getLink(self, url):
         """Extract direct link to the video from page's source

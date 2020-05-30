@@ -11,21 +11,9 @@ class Direct:
         POST['EXTENSION'] = getExtension(POST['CONTENTURL'])
         if not os.path.exists(directory): os.makedirs(directory)
 
-        filename = GLOBAL.config['filename'].format(**POST)
+        filename = GLOBAL.config['filename'].format(**POST)+POST["EXTENSION"]
+        shortFilename = POST['POSTID']+POST['EXTENSION']
 
-        print(filename+POST["EXTENSION"])
-
-        fileDir = directory / (
-            filename+POST['EXTENSION']
-        )
-        tempDir = directory / (
-            GLOBAL.config["filename"].format(**POST)+".tmp"
-        )
-
-        try:
-            getFile(fileDir,tempDir,POST['CONTENTURL'])
-        except FileNameTooLong:
-            fileDir = directory / (POST['POSTID']+POST['EXTENSION'])
-            tempDir = directory / (POST['POSTID']+".tmp")
-
-            getFile(fileDir,tempDir,POST['CONTENTURL'])
+        print(filename)
+        getFile(filename,shortFilename,directory,POST['CONTENTURL'])
+        

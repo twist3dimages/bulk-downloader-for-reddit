@@ -217,7 +217,9 @@ def extractDetails(posts,SINGLE_POST=False):
                        'REDDITOR':str(submission.author),
                        'TYPE':None,
                        'CONTENTURL':submission.url,
-                       'SUBREDDIT':submission.subreddit.display_name}
+                       'SUBREDDIT':submission.subreddit.display_name,
+                       'UPVOTES': submission.score,
+                       'FLAIR':submission.link_flair_text}
         except AttributeError:
             pass
 
@@ -248,7 +250,9 @@ def extractDetails(posts,SINGLE_POST=False):
                             'REDDITOR':str(submission.author),
                             'TYPE':None,
                             'CONTENTURL':submission.url,
-                            'SUBREDDIT':submission.subreddit.display_name}
+                            'SUBREDDIT':submission.subreddit.display_name,
+                            'UPVOTES': submission.score,
+                            'FLAIR':submission.link_flair_text}
                 except AttributeError:
                     continue
 

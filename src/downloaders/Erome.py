@@ -1,4 +1,6 @@
 import os
+import logging
+import sys
 import urllib.request
 from html.parser import HTMLParser
 
@@ -6,7 +8,7 @@ from src.downloaders.downloaderUtils import getFile
 from src.downloaders.downloaderUtils import getExtension
 
 from src.errors import (FileNameTooLong, AlbumNotDownloadedCompletely, 
-                        NotADownloadableLinkError, FileAlreadyExistsError)
+                        NotADownloadableLinkError, FileAlreadyExistsError, full_exc_info)
 from src.utils import GLOBAL
 from src.utils import printToFile as print
 
@@ -27,27 +29,15 @@ class Erome:
 
             """Filenames are declared here"""
 
-            filename = GLOBAL.config['filename'].format(**post)
-
-            print(filename+post["EXTENSION"])
-
-            fileDir = directory / (
-                filename+post['EXTENSION']
-            )
-            tempDir = directory / (
-                GLOBAL.config["filename"].format(**post)+".tmp"
-            )
+            filename = GLOBAL.config['filename'].format(**post)+post["EXTENSION"]
+            print(filename)
+            shortFilename = post['POSTID'] + extension
 
             imageURL = IMAGES[0]
-            if 'https://' not in imageURL and 'http://' not in imageURL:
+            if 'https://' not in imageURL or 'http://' not in imageURL:
                 imageURL = "https://" + imageURL
 
-            try:
-                getFile(fileDir,tempDir,imageURL)
-            except FileNameTooLong:
-                fileDir = directory / (post['POSTID'] + extension)
-                tempDir = directory / (post['POSTID'] + '.tmp')
-                getFile(fileDir,tempDir,imageURL)
+            getFile(filename,shortFilename,directory,imageURL)
 
         else:
             filename = GLOBAL.config['filename'].format(**post)
@@ -67,19 +57,16 @@ class Erome:
                 
                 extension = getExtension(IMAGES[i])
 
-                fileName = str(i+1)
+                filename = str(i+1)+extension
                 imageURL = IMAGES[i]
                 if 'https://' not in imageURL and 'http://' not in imageURL:
                     imageURL = "https://" + imageURL
 
-                fileDir = folderDir / (fileName + extension)
-                tempDir = folderDir / (fileName + ".tmp")
-
                 print("  ({}/{})".format(i+1,imagesLenght))
-                print("  {}".format(fileName+extension))
+                print("  {}".format(filename))
 
                 try:
-                    getFile(fileDir,tempDir,imageURL,indent=2)
+                    getFile(filename,filename,folderDir,imageURL,indent=2)
                     print()
                 except FileAlreadyExistsError:
                     print("  The file already exists" + " "*10,end="\n\n")

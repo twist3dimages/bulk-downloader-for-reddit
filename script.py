@@ -177,7 +177,6 @@ def download(submissions):
             downloadPost(details,directory)
         
         except FileAlreadyExistsError:
-            # raise FileAlreadyExistsError
             print("It already exists")
             duplicates += 1
             downloadedCount -= 1
@@ -200,7 +199,7 @@ def download(submissions):
 
         except NotADownloadableLinkError as exception:
             print(
-                "{class_name}: {info}".format(
+                "{class_name}: {info} See CONSOLE_LOG.txt for more information".format(
                     class_name=exception.__class__.__name__,info=str(exception)
                 )
             )
@@ -216,15 +215,20 @@ def download(submissions):
             print("No match found, skipping...")
             downloadedCount -= 1
         
-        except Exception as exception:
+        except Exception as exc:
             print(
-                "{class_name}: {info}".format(
-                    class_name=exception.__class__.__name__,info=str(exception)
+                "{class_name}: {info} See CONSOLE_LOG.txt for more information".format(
+                    class_name=exc.__class__.__name__,info=str(exc)
                 )
             )
+
+            logging.error(sys.exc_info()[0].__name__,
+                          exc_info=full_exc_info(sys.exc_info()))
+            print(log_stream.getvalue(),noPrint=True)
+
             FAILED_FILE.add({int(i+1):[
                 "{class_name}: {info}".format(
-                    class_name=exception.__class__.__name__,info=str(exception)
+                    class_name=exc.__class__.__name__,info=str(exc)
                 ),
                 submissions[i]
             ]})
@@ -269,6 +273,8 @@ def main():
         GLOBAL.configDirectory = GLOBAL.defaultConfigDirectory  / "config.json"
 
     GLOBAL.config = Config(GLOBAL.configDirectory).generate()
+
+    print("\n"," ".join(sys.argv),"\n",noPrint=True)
 
     if arguments.log is not None:
         logDir = Path(arguments.log)
