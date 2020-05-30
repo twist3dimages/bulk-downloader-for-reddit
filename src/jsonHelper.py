@@ -20,14 +20,15 @@ class JsonFile:
             with open(self.FILEDIR, 'r') as f:
                 return json.load(f)
 
-    def add(self,toBeAdded):
+    def add(self,toBeAdded,sub=None):
         """Takes a dictionary and merges it with json file.
         It uses new key's value if a key already exists.
         Returns the new content as a dictionary.
         """
 
         data = self.read()
-        data = {**data, **toBeAdded}
+        if sub: data[sub] = {**data[sub], **toBeAdded}
+        else: data = {**data, **toBeAdded}
         self.__writeToFile(data)
         return self.read()
 

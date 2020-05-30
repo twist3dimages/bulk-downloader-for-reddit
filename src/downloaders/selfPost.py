@@ -14,9 +14,10 @@ class SelfPost:
 
         filename = GLOBAL.config['filename'].format(**post)
 
+        fileDir = directory / (filename+".md")
+        print(fileDir)
         print(filename+".md")
 
-        fileDir = directory / (filename+".md")
 
         if Path.is_file(fileDir):
             raise FileAlreadyExistsError

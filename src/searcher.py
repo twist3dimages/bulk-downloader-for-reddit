@@ -25,7 +25,7 @@ def getPosts(programMode):
     Return what extractDetails has returned.
     """
 
-    reddit = Reddit(GLOBAL.config["reddit_refresh_token"]).begin()
+    reddit = Reddit(GLOBAL.config["credentials"]["reddit"]).begin()
 
     if programMode["sort"] == "best":
         raise NoPrawSupport("PRAW does not support that")

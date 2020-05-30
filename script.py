@@ -259,11 +259,6 @@ def main():
     arguments = Arguments.parse()
     GLOBAL.arguments = arguments
 
-    if arguments.directory is not None:
-        GLOBAL.directory = Path(arguments.directory.strip())
-    else:
-        GLOBAL.directory = Path(input("\ndownload directory: ").strip())
-
     if not Path(GLOBAL.defaultConfigDirectory).is_dir():
         os.makedirs(GLOBAL.defaultConfigDirectory)
 
@@ -274,12 +269,26 @@ def main():
 
     GLOBAL.config = Config(GLOBAL.configDirectory).generate()
 
+    if arguments.set_filename:
+        Config(GLOBAL.configDirectory).setCustomFileName()
+        sys.exit()
+
+    if arguments.set_folderpath:
+        Config(GLOBAL.configDirectory).setCustomFolderPath()
+        sys.exit()
+        
+    if arguments.directory:
+        GLOBAL.directory = Path(arguments.directory.strip())
+    else:
+        GLOBAL.directory = Path(input("\ndownload directory: ").strip())
+
     print("\n"," ".join(sys.argv),"\n",noPrint=True)
 
     if arguments.log is not None:
         logDir = Path(arguments.log)
         download(postFromLog(logDir))
         sys.exit()
+
 
     programMode = ProgramMode(arguments).generate()
 

@@ -29,8 +29,7 @@ class Imgur:
 
             filename = GLOBAL.config['filename'].format(**post)+post["EXTENSION"]
             shortFilename = post['POSTID']+post['EXTENSION']
-            print(filename)
-
+            
             getFile(filename,shortFilename,directory,post['MEDIAURL'])
 
         elif content['type'] == 'album':
@@ -104,8 +103,8 @@ class Imgur:
 
         config = GLOBAL.config
         return imgurpython.ImgurClient(
-            config['imgur_client_id'],
-            config['imgur_client_secret']
+            config["credentials"]['imgur_client_id'],
+            config["credentials"]['imgur_client_secret']
         )
     def getId(self,submissionURL):
         """Extract imgur post id

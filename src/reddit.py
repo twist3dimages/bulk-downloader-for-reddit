@@ -28,23 +28,22 @@ class Reddit:
             self.redditInstance = praw.Reddit(**self.arguments)
             try:
                 self.redditInstance.auth.scopes()
+                return self.redditInstance
             except ResponseException:
                 self.arguments["redirect_uri"] = "http://localhost:" + str(self.PORT)
                 self.redditInstance = praw.Reddit(**self.arguments)
                 reddit, refresh_token = self.getRefreshToken(*self.SCOPES)
-                JsonFile(GLOBAL.configDirectory).add({
-                    "reddit_username":str(reddit.user.me()),
-                    "reddit_refresh_token":refresh_token
-                })
         else:
             self.arguments["redirect_uri"] = "http://localhost:" + str(self.PORT)
             self.redditInstance = praw.Reddit(**self.arguments)
             reddit, refresh_token = self.getRefreshToken(*self.SCOPES)
-            JsonFile(GLOBAL.configDirectory).add({
-                "reddit_username":str(reddit.user.me()),
-                "reddit_refresh_token":refresh_token
-            })
-        return self.redditInstance 
+
+        JsonFile(GLOBAL.configDirectory).add({
+            "reddit_username": str(reddit.user.me()),
+            "reddit": refresh_token
+        },"credentials")
+
+        return self.redditInstance
 
     def recieve_connection(self):
         """Wait for and then return a connected socket..

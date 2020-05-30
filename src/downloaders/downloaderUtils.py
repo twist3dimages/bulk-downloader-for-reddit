@@ -4,7 +4,8 @@ from urllib.error import HTTPError
 import urllib.request
 from pathlib import Path
 
-from src.utils import nameCorrector, printToFile
+from src.utils import nameCorrector
+from src.utils import printToFile as print
 from src.errors import FileAlreadyExistsError, FileNameTooLong
 
 def dlProgress(count, blockSize, totalSize):
@@ -52,6 +53,10 @@ def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
     urllib.request.install_opener(opener)
 
     filename = nameCorrector(filename)
+
+    print(" "*indent + str(folderDir),
+         " "*indent + str(filename),
+         sep="\n")
 
     for i in range(3):
         fileDir = Path(folderDir) / filename

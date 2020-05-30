@@ -104,7 +104,17 @@ class Arguments:
                                 "erome","gifdelverynetwork","direct","self"
                             ],
                             type=str,
-                            default=[])                   
+                            default=[])   
+
+        parser.add_argument("--set-folderpath",
+                            action="store_true",
+                            help="Set custom folderpath"
+                            )                
+
+        parser.add_argument("--set-filename",
+                            action="store_true",
+                            help="Set custom filename",
+                            ) 
 
         if arguments == []:
             return parser.parse_args()

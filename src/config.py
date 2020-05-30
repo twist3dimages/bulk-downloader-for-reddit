@@ -14,15 +14,35 @@ class Config():
 
     def generate(self):
         self._validateCredentials()
-        self._validateCustomFileName()
-        self._validateCustomFolderPath()
+        self._readCustomFileName()
+        self._readCustomFolderPath()
         return self.file.read()
 
     def setCustomFileName(self):
-        pass
+        print("""
+IMPORTANT: Do not change the filename structure frequently.
+           If you did, the program could not find duplicates and
+           would download the already downloaded files again.
+           This would not create any duplicates in the directory but
+           the program would not be as snappy as it should be.
 
-    def _validateCustomFileName(self,name=None):
+Type a template file name for each post.
+
+You can use SUBREDDIT, REDDITOR, POSTID, TITLE, UPVOTES, FLAIR in curly braces
+The text in curly braces will be replaced with the corresponding property of an each post
+
+For example: {FLAIR}_{SUBREDDIT}_{REDDITOR}
+
+Existing filename template:""", None if "filename" not in self.file.read() else self.file.read()["filename"])
+
+        filename = input(">> ")
+        self.file.add({
+            "filename": filename
+        })
+
+    def _readCustomFileName(self):
         content = self.file.read()
+
         if not "filename" in content:
             self.file.add({
                 "filename": "{REDDITOR}_{TITLE}_{POSTID}"
@@ -33,13 +53,29 @@ class Config():
             })
 
     def setCustomFolderPath(self):
-        pass
+        print("""
+Type a folder structure (generic folder path)
 
-    def _validateCustomFolderPath(self,path=None):
+Use slash or DOUBLE backslash to separate folders
+
+You can use SUBREDDIT, REDDITOR, POSTID, TITLE, UPVOTES, FLAIR in curly braces
+The text in curly braces will be replaced with the corresponding property of an each post
+
+For example: {REDDITOR}/{SUBREDDIT}/{FLAIR}
+
+Existing folder structure""", None if "folderpath" not in self.file.read() else self.file.read()["folderpath"])
+
+        folderpath = input(">> ").strip("\\").strip("/")
+
+        self.file.add({
+            "folderpath": folderpath
+        })
+
+    def _readCustomFolderPath(self,path=None):
         content = self.file.read()
         if not "folderpath" in content:
             self.file.add({
-                "folderpath": "\\{SUBREDDIT}\\"
+                "folderpath": "{SUBREDDIT}"
             })
 
     def _validateCredentials(self):
@@ -47,9 +83,15 @@ class Config():
 
         keys = ['imgur_client_id',
                 'imgur_client_secret']
-
-        content = self.file.read()
-        if "reddit_refresh_token" in content and len(content["reddit_refresh_token"]) != 0:
+        try:
+            content = self.file.read()["credentials"]
+        except:
+            self.file.add({
+                "credentials":{}
+            })
+            content = self.file.read()["credentials"]
+            
+        if "reddit" in content and len(content["reddit"]) != 0:
             pass
         else:
             Reddit().begin()
@@ -70,5 +112,6 @@ class Config():
                 if content[key] == "":
                     raise KeyError
             except KeyError:
-                self.file.add({key:input("\t"+key+": ")})
+                self.file.add({key:input("\t"+key+": ")},
+                              "credentials")
         print()

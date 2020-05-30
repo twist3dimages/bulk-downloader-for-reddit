@@ -30,7 +30,6 @@ class Erome:
             """Filenames are declared here"""
 
             filename = GLOBAL.config['filename'].format(**post)+post["EXTENSION"]
-            print(filename)
             shortFilename = post['POSTID'] + extension
 
             imageURL = IMAGES[0]

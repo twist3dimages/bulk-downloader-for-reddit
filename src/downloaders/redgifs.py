@@ -22,8 +22,7 @@ class Redgifs:
 
         filename = GLOBAL.config['filename'].format(**POST)+POST["EXTENSION"]
         shortFilename = POST['POSTID']+POST['EXTENSION']
-        print(filename)
-
+        
         getFile(filename,shortFilename,directory,POST['MEDIAURL'])
 
     def getLink(self, url):
