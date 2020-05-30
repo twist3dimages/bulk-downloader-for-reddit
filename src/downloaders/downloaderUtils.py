@@ -1,10 +1,12 @@
 import sys
 import os
+import time
 from urllib.error import HTTPError
 import urllib.request
 from pathlib import Path
+import hashlib
 
-from src.utils import nameCorrector
+from src.utils import nameCorrector, GLOBAL
 from src.utils import printToFile as print
 from src.errors import FileAlreadyExistsError, FileNameTooLong
 
@@ -67,6 +69,14 @@ def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
                 urllib.request.urlretrieve(imageURL,
                                            tempDir,
                                            reporthook=dlProgress)
+
+                if GLOBAL.arguments.no_dupes:
+                    fileHash = createHash(tempDir)
+                    if fileHash in GLOBAL.hashList:
+                        os.remove(tempDir)
+                        raise FileAlreadyExistsError
+                    GLOBAL.hashList.add(fileHash)
+
                 os.rename(tempDir,fileDir)
                 print(" "*indent+"Downloaded"+" "*10)
                 break
@@ -77,3 +87,10 @@ def getFile(filename,shortFilename,folderDir,imageURL,indent=0):
                 filename = shortFilename
         else:
             raise FileAlreadyExistsError
+
+def createHash(filename):
+    hash_md5 = hashlib.md5()
+    with open(filename, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()

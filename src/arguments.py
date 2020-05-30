@@ -119,6 +119,11 @@ class Arguments:
         parser.add_argument("--set-default-directory",
                             action="store_true",
                             help="Set a default directory to be used in case no directory is given",
+                            )
+
+        parser.add_argument("--no-dupes",
+                            action="store_true",
+                            help="Remove duplicate posts on different subreddits",
                             ) 
 
         if arguments == []:
