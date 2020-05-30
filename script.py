@@ -21,6 +21,7 @@ from src.downloaders.Imgur import Imgur
 from src.downloaders.redgifs import Redgifs
 from src.downloaders.selfPost import SelfPost
 from src.downloaders.vreddit import VReddit
+from src.downloaders.youtube import Youtube
 from src.downloaders.gifDeliveryNetwork import GifDeliveryNetwork
 from src.errors import ImgurLimitError, NoSuitablePost, FileAlreadyExistsError, ImgurLoginError, NotADownloadableLinkError, NoSuitablePost, full_exc_info
 from src.parser import LinkDesigner
@@ -66,7 +67,7 @@ def isPostExists(POST,directory):
 
     filename = GLOBAL.config['filename'].format(**POST)
 
-    possibleExtensions = [".jpg",".png",".mp4",".gif",".webm",".md"]
+    possibleExtensions = [".jpg",".png",".mp4",".gif",".webm",".md",".mkv",".flv"]
 
     for extension in possibleExtensions:
 
@@ -86,7 +87,7 @@ def downloadPost(SUBMISSION,directory):
     downloaders = {
         "imgur":Imgur,"gfycat":Gfycat,"erome":Erome,"direct":Direct,"self":SelfPost,
         "redgifs":Redgifs, "gifdeliverynetwork": GifDeliveryNetwork,
-        "v.redd.it": VReddit
+        "v.redd.it": VReddit, "youtube": Youtube
     }
 
     print()

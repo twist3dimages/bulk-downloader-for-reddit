@@ -294,6 +294,16 @@ def matchWithDownloader(submission,skip=[]):
     if 'gfycat' in submission.domain and 'gfycat' not in skip:
         return {'TYPE': 'gfycat'}
 
+    if 'youtube' in submission.domain \
+        and 'watch' in submission.url \
+        and 'youtube' not in skip:
+        return {'TYPE': 'youtube'}
+
+    if 'youtu.be' in submission.domain  and 'youtube' not in skip:
+        url = urllib.request.urlopen(submission.url).geturl()
+        if 'watch' in url:
+            return {'TYPE': 'youtube'}
+
     elif 'imgur' in submission.domain and 'imgur' not in skip:
         return {'TYPE': 'imgur'}
 
