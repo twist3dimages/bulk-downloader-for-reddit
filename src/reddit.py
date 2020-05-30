@@ -10,10 +10,10 @@ from src. errors import RedditLoginFailed
 
 class Reddit:
     
-    def __init__(self,config):
+    def __init__(self,refresh_token=None):
         self.SCOPES = ['identity','history','read']
-        self.PORT = 1337
-        self.config = config
+        self.PORT = 7634
+        self.refresh_token = refresh_token
         self.redditInstance = None
         self.arguments = {
             "client_id":GLOBAL.reddit_client_id,
@@ -23,28 +23,27 @@ class Reddit:
 
     def begin(self):
 
-        if "reddit_refresh_token" in self.config:
-            self.arguments["refresh_token"] = self.config["reddit_refresh_token"]
+        if self.refresh_token:
+            self.arguments["refresh_token"] = self.refresh_token
             self.redditInstance = praw.Reddit(**self.arguments)
             try:
                 self.redditInstance.auth.scopes()
+                return self.redditInstance
             except ResponseException:
                 self.arguments["redirect_uri"] = "http://localhost:" + str(self.PORT)
                 self.redditInstance = praw.Reddit(**self.arguments)
                 reddit, refresh_token = self.getRefreshToken(*self.SCOPES)
-                JsonFile(GLOBAL.configDirectory).add({
-                    "reddit_username":str(reddit.user.me()),
-                    "reddit_refresh_token":refresh_token
-                })
         else:
             self.arguments["redirect_uri"] = "http://localhost:" + str(self.PORT)
             self.redditInstance = praw.Reddit(**self.arguments)
             reddit, refresh_token = self.getRefreshToken(*self.SCOPES)
-            JsonFile(GLOBAL.configDirectory).add({
-                "reddit_username":str(reddit.user.me()),
-                "reddit_refresh_token":refresh_token
-            })
-        return self.redditInstance 
+
+        JsonFile(GLOBAL.configDirectory).add({
+            "reddit_username": str(reddit.user.me()),
+            "reddit": refresh_token
+        },"credentials")
+
+        return self.redditInstance
 
     def recieve_connection(self):
         """Wait for and then return a connected socket..
